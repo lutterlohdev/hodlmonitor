@@ -76,7 +76,7 @@
       {/if}
       <span class="button-text">{tab.name}</span>
       {#if $activePane.id == tab.id}
-        <span class="indicator" />
+        <span class="indicator"></span>
       {/if}
     </button>
   {/each}

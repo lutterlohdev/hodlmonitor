@@ -3,6 +3,15 @@
   import HeaderButton from "./buttons/HeaderButton.svelte";
 
   export let isSidebarOpen = false;
+
+  const closeSidebar = () => (isSidebarOpen = !isSidebarOpen);
+
+  const handleOverlayKeyboard = (event) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      closeSidebar();
+    }
+  };
 </script>
 
 {#if isSidebarOpen}
@@ -15,7 +24,14 @@
 
     <slot />
   </aside>
-  <div class="overlay" on:click={() => (isSidebarOpen = !isSidebarOpen)} />
+  <div
+    class="overlay"
+    on:click={closeSidebar}
+    on:keydown={handleOverlayKeyboard}
+    role="button"
+    tabindex="0"
+    aria-label="Close sidebar"
+  ></div>
 {/if}
 
 <style>

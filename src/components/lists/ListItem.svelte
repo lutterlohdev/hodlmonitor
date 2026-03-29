@@ -8,7 +8,8 @@
   export let dataType = null;
 
   const handleKeyboard = (event) => {
-    if (event.keyCode == 13) {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
       event.target.click();
     }
   };
@@ -19,7 +20,8 @@
     class="container"
     on:click={clickHandler}
     tabindex="0"
-    on:keypress={handleKeyboard}
+    on:keydown={handleKeyboard}
+    role="button"
   >
     <div class="name-container">
       <h2>{name}</h2>
