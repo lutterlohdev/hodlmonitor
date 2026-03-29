@@ -1,10 +1,24 @@
 <script>
   import { fade } from "svelte/transition";
   import { snackbar } from "../store";
+
+  const handleDismissKeyboard = (event) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      snackbar.dismiss();
+    }
+  };
 </script>
 
 {#if $snackbar.length > 0}
-  <div transition:fade on:click={() => snackbar.dismiss()}>
+  <div
+    transition:fade
+    on:click={() => snackbar.dismiss()}
+    on:keydown={handleDismissKeyboard}
+    role="button"
+    tabindex="0"
+    aria-label="Dismiss messages"
+  >
     <h2 class="sr-only">Informational Messages (Click to dismiss):</h2>
     <ul>
       {#each $snackbar as message}

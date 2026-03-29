@@ -2,10 +2,11 @@ import svelte from 'rollup-plugin-svelte';
 import commonjs from '@rollup/plugin-commonjs';
 import resolve from '@rollup/plugin-node-resolve';
 import livereload from 'rollup-plugin-livereload';
-import { terser } from 'rollup-plugin-terser';
+import terser from '@rollup/plugin-terser';
 import css from 'rollup-plugin-css-only';
 import json from '@rollup/plugin-json';
 import { generateSW } from 'rollup-plugin-workbox';
+import { spawn } from 'node:child_process';
 
 const production = !process.env.ROLLUP_WATCH;
 
@@ -19,7 +20,7 @@ function serve() {
 	return {
 		writeBundle() {
 			if (server) return;
-			server = require('child_process').spawn('npm', ['run', 'start', '--', '--dev'], {
+			server = spawn('npm', ['run', 'start', '--', '--dev'], {
 				stdio: ['ignore', 'inherit', 'inherit'],
 				shell: true
 			});
@@ -32,6 +33,17 @@ function serve() {
 
 export default {
 	input: 'src/main.js',
+	onwarn(warning, warn) {
+		if (
+			warning.code === 'CIRCULAR_DEPENDENCY' &&
+			typeof warning.message === 'string' &&
+			warning.message.includes('node_modules/svelte/src/internal')
+		) {
+			return;
+		}
+
+		warn(warning);
+	},
 	output: {
 		sourcemap: true,
 		format: 'iife',
@@ -42,7 +54,9 @@ export default {
 		svelte({
 			compilerOptions: {
 				// enable run-time checks when not in production
-				dev: !production
+				dev: !production,
+				// Svelte 5 requires explicit client-side output
+				generate: 'client'
 			}
 		}),
 		json(),
@@ -57,6 +71,7 @@ export default {
 		// https://github.com/rollup/plugins/tree/master/packages/commonjs
 		resolve({
 			browser: true,
+			exportConditions: ['browser'],
 			dedupe: ['svelte']
 		}),
 		commonjs(),

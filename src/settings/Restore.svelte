@@ -3,6 +3,7 @@
   import { snackbar } from "../store";
   import { watchlist } from "../watchlist/store";
   let files;
+  let fileInput;
 
   const updatePortfolio = (data) => {
     try {
@@ -34,20 +35,17 @@
     }
   };
 
-  const handleKeyboard = (event) => {
-    if (event.keyCode == 13) {
-      event.target.click();
-    }
-  };
+  const openFilePicker = () => fileInput?.click();
 </script>
 
 <form on:submit|preventDefault={upload}>
-  <label tabindex="0" for="file" on:keypress={handleKeyboard}
-    ><span class="material-icons">restore</span>Restore from Local Backup</label
+  <button type="button" on:click={openFilePicker}
+    ><span class="material-icons">restore</span>Restore from Local Backup</button
   >
   <input
     required
     type="file"
+    bind:this={fileInput}
     bind:files
     name="file"
     id="file"
@@ -56,7 +54,7 @@
 </form>
 
 <style>
-  label {
+  button {
     box-sizing: border-box;
     margin: 0 auto;
     display: block;
@@ -70,27 +68,29 @@
     font-size: 18px;
     text-decoration: none;
     text-align: left;
+    border: 0;
+    font-family: inherit;
   }
-  label:hover,
-  label:focus {
+  button:hover,
+  button:focus {
     background: var(--alt-text-color);
     color: var(--primary-color);
   }
-  label:active {
+  button:active {
     transform: scale(0.95);
   }
-  label > span {
+  button > span {
     vertical-align: text-bottom;
     padding-right: 0.5em;
   }
 
   @media (prefers-color-scheme: dark) {
-    label {
+    button {
       background: var(--secondary-body-color);
       color: var(--text-color);
     }
-    label:hover,
-    label:focus {
+    button:hover,
+    button:focus {
       background: var(--text-color);
       color: var(--secondary-body-color);
     }
