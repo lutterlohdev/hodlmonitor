@@ -5,8 +5,22 @@ import livereload from 'rollup-plugin-livereload';
 import terser from '@rollup/plugin-terser';
 import css from 'rollup-plugin-css-only';
 import json from '@rollup/plugin-json';
-import { generateSW } from 'rollup-plugin-workbox';
 import { spawn } from 'node:child_process';
+import { randomFillSync, webcrypto } from 'node:crypto';
+
+if (!globalThis.crypto) {
+	if (webcrypto?.getRandomValues) {
+		globalThis.crypto = webcrypto;
+	} else {
+		globalThis.crypto = {
+			getRandomValues(typedArray) {
+				return randomFillSync(typedArray);
+			}
+		};
+	}
+}
+
+const { generateSW } = await import('rollup-plugin-workbox');
 
 const production = !process.env.ROLLUP_WATCH;
 
