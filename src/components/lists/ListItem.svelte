@@ -49,31 +49,36 @@
 
 <style>
   h2 {
-    font-size: 1.2em;
-    font-weight: normal;
+    font-size: 1.05em;
+    font-weight: 600;
+    letter-spacing: 0.01em;
     margin: 0;
   }
   li {
-    transition: all 0.5s;
-    border-bottom: thin solid var(--border-color);
+    transition: background 0.25s ease;
+    border-bottom: 1px solid var(--border-color);
   }
-  /* .container:focus{
-    outline: var(--primary-color) 1px dotted;
-  } */
+
   .container {
     display: flex;
     align-items: center;
     flex: 0 1 auto;
-    padding: 1em 0.8em 1em 1.4em;
+    padding: 0.9em 1em 0.9em 1.1em;
     cursor: pointer;
+    gap: 0.75em;
+    min-height: 56px;
+  }
+  .container:hover {
+    background: color-mix(in srgb, var(--primary-color) 7%, transparent);
   }
   .name-container {
     flex: 1 1 auto;
     text-align: left;
   }
   .value-container {
-    margin-right: 1em;
+    margin-right: 0.25em;
     text-align: center;
+    font-weight: 600;
   }
   @media (prefers-color-scheme: dark) {
     .value-container {

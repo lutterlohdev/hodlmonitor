@@ -20,12 +20,17 @@
 <style>
   header{
     color: var(--alt-text-color);
-    background: var(--primary-color);
-    box-sizing: border-box;
+    background: linear-gradient(180deg, var(--top-bar-color), var(--primary-color));
     width: 100%;
     flex: 0 1 auto;
     display: flex;
-    padding: 8px;
+    align-items: center;
+    padding: 10px 12px;
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    backdrop-filter: saturate(160%) blur(8px);
+    border-bottom: 1px solid color-mix(in srgb, var(--border-color) 60%, transparent);
   }
   div{
     flex: 0 1 auto;
@@ -36,8 +41,10 @@
   h1{
     display: block;
     margin: 0;
-    padding: 8px;
-    font-size: 16px;
+    padding: 8px 10px;
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
     text-overflow: ellipsis;
     overflow: hidden;
@@ -47,7 +54,7 @@
   @media(prefers-color-scheme: dark){
     header{
       color: var(--text-color);
-      background: var(--body-color);
+      background: color-mix(in srgb, var(--body-color) 88%, black);
     }
   }
 </style>

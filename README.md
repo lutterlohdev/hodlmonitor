@@ -1,5 +1,14 @@
 # HODL Monitor
 
+## 2026 Refresh
+
+This project has been refreshed for a modern browser stack:
+
+- Updated visual design system (light + dark palettes, improved spacing, stronger accessibility focus states)
+- Modernized JavaScript data/fetch layer (timeouts, safer JSON parsing, stricter comparisons)
+- Improved PWA setup (enhanced manifest metadata, shortcuts, runtime caching for API/images/fonts, navigation fallback)
+- More robust service worker lifecycle (update checks + automatic refresh when a new worker activates)
+
 HODL Monitor provides a single place to view and monitor your crypto holdings as well as a customizable watchlist without the need for another account, a complicated signup, API keys, or another password to remember.
 
 This app runs in the browser and relies on your browser's LocalStorage to remember your portfolio. The only external service calls are to get current prices and fonts (the app doesn't send your data anywhere).
@@ -20,7 +29,9 @@ Creator note: This app is not going to be for everyone. It lacks historical tren
 2. `cd hodlmonitor`
 3. Run `npm install`
 4. Run `npm run dev`
-5. Go to `http://localhost:5000` (this port may be different on your machine)
+5. Go to `http://localhost:5173` (this port may be different on your machine)
+
+For a production preview after building, run `npm run preview`.
 
 _Voila!_
 

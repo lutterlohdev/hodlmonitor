@@ -8,7 +8,16 @@
 
 <InputContainer>
   <Label name={name}><slot></slot></Label>
-  <input required name={name} type="number" min=0 step=.000000001 placeholder="1.12345" value={value}/>
+  <input
+    required
+    name={name}
+    id={name}
+    type="number"
+    min="0"
+    step="0.000000001"
+    placeholder="1.12345"
+    bind:value
+  />
 </InputContainer>
 
 
@@ -18,14 +27,15 @@
   opacity: .6;
 }
 input{    
-  border: 0;
-  border-bottom: 4px solid var(--alt-text-color);
+  border: 1px solid color-mix(in srgb, var(--alt-text-color) 50%, transparent);
+  border-radius: var(--radius-sm);
   color: var(--alt-text-color);
-  background: none;
+  background: color-mix(in srgb, var(--secondary-body-color) 12%, transparent);
   outline: 0;
-  height: 1.4em;
+  height: 2.7em;
   font-size: 1.2em;
   margin: .5em;
+  padding: 0 0.8em;
 }
 /*https://css-tricks.com/snippets/css/change-autocomplete-styles-webkit-browsers/*/
 input:-webkit-autofill,
@@ -33,10 +43,9 @@ input:-webkit-autofill:hover,
 input:-webkit-autofill:focus, 
 input:-webkit-autofill:active
 {
-  border: 0;
-  border-bottom: 4px solid var(--alt-text-color);
+  border: 1px solid color-mix(in srgb, var(--alt-text-color) 50%, transparent);
   -webkit-text-fill-color: var(--alt-text-color) !important;
- -webkit-box-shadow: 0 0 0 30px var(--primary-color) inset !important;
+ -webkit-box-shadow: 0 0 0 30px color-mix(in srgb, var(--secondary-body-color) 12%, transparent) inset !important;
 }
 
 @media(prefers-color-scheme: dark){
@@ -45,8 +54,9 @@ input:-webkit-autofill:active
     opacity: .6;
   }
   input{    
-    border-bottom: 4px solid var(--primary-color);
+    border: 1px solid var(--border-color);
     color: var(--primary-color);
+    background: color-mix(in srgb, var(--secondary-body-color) 96%, black);
   }
   /*https://css-tricks.com/snippets/css/change-autocomplete-styles-webkit-browsers/*/
   input:-webkit-autofill,
@@ -54,9 +64,9 @@ input:-webkit-autofill:active
   input:-webkit-autofill:focus, 
   input:-webkit-autofill:active
   {
-    border-bottom: 4px solid var(--primary-color);
+    border: 1px solid var(--border-color);
     -webkit-text-fill-color: var(--primary-color) !important;
-  -webkit-box-shadow: 0 0 0 30px var(--secondary-body-color) inset !important;
+  -webkit-box-shadow: 0 0 0 30px color-mix(in srgb, var(--secondary-body-color) 96%, black) inset !important;
   }
 }
 </style>

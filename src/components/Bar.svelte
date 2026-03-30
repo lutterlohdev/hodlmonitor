@@ -30,6 +30,7 @@
     position: fixed;
     top: 0;
     left: 0;
+    z-index: 60;
     box-shadow: 0 1px 4px var(--text-color);
   }
   .bar > div{
