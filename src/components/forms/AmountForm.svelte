@@ -3,19 +3,19 @@
   import ButtonContainer from "../buttons/ButtonContainer.svelte";
   import FormButton from "../buttons/FormButton.svelte";
 
-  export let amountToAdd;
+  export let amount = "";
   export let currencyName;
+  export let onSubmitAmount = () => {};
 
-  function submit(event) {
-    const amount = event.target.amount.value;
-    amountToAdd.set(parseFloat(amount));
+  function submit() {
+    onSubmitAmount(Number(amount));
   }
 </script>
 
 <form on:submit|preventDefault={submit}>
-  <NumberInput name="amount">What amount of {currencyName} do you hold?</NumberInput>
+  <NumberInput bind:value={amount} name="amount">What amount of {currencyName} do you hold?</NumberInput>
   <ButtonContainer>
-    <FormButton type="submit">Add</FormButton>
+    <FormButton type="submit" disabled={!amount || Number(amount) <= 0}>Add to Portfolio</FormButton>
   </ButtonContainer>
 </form>
 
@@ -23,5 +23,7 @@
   form{
     padding: 1em;
     box-sizing: border-box;
+    margin: 0 auto;
+    max-width: 640px;
   }
 </style>

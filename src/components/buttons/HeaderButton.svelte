@@ -1,4 +1,4 @@
-<button type="text" on:click>
+<button type="button" on:click>
   <slot></slot>
 </button>
 
@@ -9,9 +9,15 @@
     color: var(--alt-text-color);
     cursor: pointer;
     font-size: 0;
-    padding: 8px;
+    padding: 10px;
     line-height: 1;
-    margin-right: 16px;
+    margin-right: 8px;
+    border-radius: 999px;
+    transition: background 0.2s ease;
+  }
+  button:hover,
+  button:focus-visible {
+    background: color-mix(in srgb, currentColor 16%, transparent);
   }
   button:last-of-type{
     margin-right: 0;

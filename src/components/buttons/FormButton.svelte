@@ -1,8 +1,9 @@
 <script>
   export let type;
+  export let disabled = false;
 </script>
 
-<button type={type} on:click><slot></slot></button>
+<button type={type} {disabled} on:click><slot></slot></button>
 
 <style>
 button {
@@ -14,8 +15,9 @@ button {
   cursor: pointer;
   text-transform: uppercase;
   font-weight: bold;
-  border: 3px solid var(--alt-text-color);
-  padding: 1em 0;
+  border: 2px solid color-mix(in srgb, var(--alt-text-color) 85%, transparent);
+  border-radius: var(--radius-sm);
+  padding: 0.9em 0;
   transition: 0.2s all;
   width: 100%;
   max-width: 400px;
@@ -30,16 +32,30 @@ button:hover, button:focus {
 button:active {
   transform: scale(.95);
 }
+button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+button:disabled:hover,
+button:disabled:focus {
+  background: var(--primary-color);
+  color: var(--alt-text-color);
+}
 
 @media(prefers-color-scheme: dark){
   button {
     background: var(--secondary-body-color);
     color: var(--text-color);
-    border: 3px solid var(--text-color);
+    border: 2px solid var(--border-color);
   }
   button:hover, button:focus {
     background: var(--text-color);
     color:  var(--secondary-body-color);
+  }
+  button:disabled:hover,
+  button:disabled:focus {
+    background: var(--secondary-body-color);
+    color: var(--text-color);
   }
 
 }

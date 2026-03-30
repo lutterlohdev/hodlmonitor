@@ -1,6 +1,11 @@
 import { derived, writable } from "svelte/store";
 import { snackbar } from "../store";
-import { getDollarDisplayValue, getPercentage } from "../utils";
+import {
+  fetchJson,
+  getDollarDisplayValue,
+  getPercentage,
+  safeJsonParse,
+} from "../utils";
 
 export const portfolio = createPortfolio();
 export const lastUpdated = writable(localStorage.getItem("portfolioLastUpdated") || "");
@@ -10,13 +15,13 @@ const apiResponse = writable({});
 
 // This has to exist to support migrating to the new variable
 function getPortfolioFromLocalStorage() {
-  const portfolio = localStorage.getItem("portfolio");
-  const oldPortfolio = localStorage.getItem("wallet");
+  const currentPortfolioRaw = localStorage.getItem("portfolio");
+  const oldPortfolioRaw = localStorage.getItem("wallet");
 
-  if (portfolio) {
-    return JSON.parse(portfolio);
-  } else if (oldPortfolio) {
-    return JSON.parse(oldPortfolio);
+  if (currentPortfolioRaw) {
+    return safeJsonParse(currentPortfolioRaw, []);
+  } else if (oldPortfolioRaw) {
+    return safeJsonParse(oldPortfolioRaw, []);
   } else {
     return [];
   }
@@ -48,7 +53,10 @@ function createPortfolio() {
     },
     updateAmount: (id, amount) => {
       update((portfolioArray) => {
-        const index = portfolioArray.findIndex((obj) => obj.id == id);
+        const index = portfolioArray.findIndex((obj) => obj.id === id);
+        if (index < 0) {
+          return portfolioArray;
+        }
         portfolioArray[index].amountHeld = amount;
         portfolioArray[index].value =
           parseFloat(portfolioArray[index].price) * parseFloat(amount);
@@ -58,7 +66,10 @@ function createPortfolio() {
     updatePrice: (id, price) => {
       // Price needs to stay part of portfolio and not just displayData or we run into some weird loading issues
       update((portfolioArray) => {
-        const index = portfolioArray.findIndex((obj) => obj.id == id);
+        const index = portfolioArray.findIndex((obj) => obj.id === id);
+        if (index < 0) {
+          return portfolioArray;
+        }
         portfolioArray[index].price = price;
         portfolioArray[index].value = parseFloat(price) * parseFloat(portfolioArray[index].amountHeld);
         return [...portfolioArray];
@@ -73,12 +84,14 @@ function createPortfolio() {
       if (isArray) {
         // This just checks if the property exists, not the type. Could got that far but probably not needed.
         fileData.forEach((item) => {
-          !(
-            item.hasOwnProperty("id") &&
-            item.hasOwnProperty("name") &&
-            item.hasOwnProperty("symbol") &&
-            item.hasOwnProperty("amountHeld")
-          ) ? (errorFlag = true) : null;
+          if (!(
+            Object.prototype.hasOwnProperty.call(item, "id") &&
+            Object.prototype.hasOwnProperty.call(item, "name") &&
+            Object.prototype.hasOwnProperty.call(item, "symbol") &&
+            Object.prototype.hasOwnProperty.call(item, "amountHeld")
+          )) {
+            errorFlag = true;
+          }
         });
       }
       if (!errorFlag) {
@@ -139,28 +152,27 @@ export const displayData = derived([portfolio, totalValue], ([$portfolio, $total
   });
 
   // Sort by value
-  returnData.sort(function(a, b) {
-    return a["value"] - b["value"];
-  }).reverse();
+  returnData.sort((a, b) => b.value - a.value);
 
   return returnData;
 });
 
-export const updatePortfolioPrices = (symbols) => {
+export const updatePortfolioPrices = async (symbols) => {
   if (symbols.length > 0) {
     snackbar.addMessage("Portfolio prices refreshing...", 2000);
-    fetch("https://api.coingecko.com/api/v3/simple/price?vs_currencies=usd&ids=" + symbols)
-        .then((result) => {
-          return result.json();
-        })
-        .then((json) => {
-          apiResponse.set(json);
-        })
-        .catch((error) => {
-          snackbar.addMessage("Error getting current prices.");
-          console.error("Error getting current prices.", error);
-          return [];
-        });
+
+    const searchParams = new URLSearchParams({
+      vs_currencies: "usd",
+      ids: symbols,
+    });
+
+    try {
+      const json = await fetchJson(`https://api.coingecko.com/api/v3/simple/price?${searchParams.toString()}`);
+      apiResponse.set(json);
+    } catch (error) {
+      snackbar.addMessage("Error getting current prices.");
+      console.error("Error getting current prices.", error);
+    }
   }
 };
 
@@ -169,7 +181,7 @@ apiResponse.subscribe((value) => {
     const timestamp = new Date();
     lastUpdated.set(timestamp.toLocaleDateString() + " " + timestamp.toLocaleTimeString());
   }
-  Object.keys(value).forEach(key => {
+  Object.keys(value).forEach((key) => {
     portfolio.updatePrice(key, value[key].usd);
   });
 });

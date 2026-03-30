@@ -12,21 +12,25 @@
   div{
     background:var(--total-value-color);
     color: var(--alt-text-color);
-    margin: 0 auto;
-    padding: 2em 1em;
+    margin: 1rem;
+    border-radius: var(--radius-md);
+    box-shadow: var(--surface-shadow);
+    padding: 1.5em 1em;
     text-align: center;
   }
   h2{
-    font-size: 1.4em;
-    font-weight: 100;
+    font-size: 1em;
+    font-weight: 500;
+    opacity: 0.9;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
     margin: 0;
   }
   p{
-    font-family: 'Roboto Condensed', sans-serif;
     color:var(--alt-text-color);
-    font-size: 2em;
-    font-weight: bold;
-    margin: 0;
+    font-size: clamp(1.8rem, 4vw, 2.6rem);
+    font-weight: 700;
+    margin: 0.2em 0 0;
   }
   @media(prefers-color-scheme: dark){
     div{

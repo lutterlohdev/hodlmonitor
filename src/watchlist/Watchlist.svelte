@@ -54,21 +54,25 @@ import WatchlistItemOptions from "./WatchlistItemOptions.svelte";
 <style>
   ul {
     background: var(--secondary-body-color);
-    border-collapse: collapse;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    box-shadow: var(--surface-shadow);
     text-align: left;
-    margin: 0 auto;
+    margin: 0 1rem;
     padding: 0;
     list-style: none;
+    overflow: hidden;
   }
   .last-updated {
     font-size: 0.8em;
-    color: var(--text-color);
+    color: color-mix(in srgb, var(--text-color) 75%, transparent);
     text-align: center;
+    margin: 1rem;
   }
 
   .instruction {
     text-align: center;
-    margin: 4em 2em;
+    margin: 4em 2em 2em;
   }
   .material-icons {
     vertical-align: text-bottom;

@@ -1,59 +1,28 @@
 <script>
-  import {writable} from "svelte/store";
   import TextInput from "./TextInput.svelte";
   import ButtonContainer from "../buttons/ButtonContainer.svelte";
   import FormButton from "../buttons/FormButton.svelte";
-  import {cryptoList} from "../../store";
+  export let value = "";
+  export let placeholder = "BTC, Bitcoin, ETH...";
+  export let submitLabel = "Search";
+  export let disabled = false;
+  export let errorMessage = "";
+  export let onSubmitSearch = () => {};
 
-  export let results;
-  
-  const noResultsError = writable(false);
-  const searchError = writable(false);
-
-  export const filterCrypto = (searchTerm) => {
-    const filteredList = $cryptoList.filter(crypto => {
-      if (crypto.symbol.toUpperCase() == searchTerm.toUpperCase() || crypto.name.toUpperCase() == searchTerm.toUpperCase()) {
-        return true;
-      }
-    });
-    return filteredList;
+  const submit = () => {
+    onSubmitSearch(value.trim());
   };
-
-  async function getAsset(event) {
-    const searchText = event.target.search.value;
-
-    reset();
-    try {
-      const currency = await filterCrypto(searchText);
-  
-      if (currency && currency.length > 0) {
-        results.set(currency);
-      } else {
-        noResultsError.set(true);
-      }
-    } catch (error) {
-      console.log("Error with Search", error);
-      searchError.set(true);
-    }
-  }
-
-  function reset() {
-    noResultsError.set(false);
-    searchError.set(false);
-  }
 </script>
 
-<form on:submit|preventDefault={getAsset}>
-  <TextInput name="search" placeholder="i.e. BTC, Bitcoin">Cryptocurrency Name or Symbol</TextInput>
+<form on:submit|preventDefault={submit}>
+  <TextInput bind:value name="search" {placeholder}>Cryptocurrency Name or Symbol</TextInput>
   <ButtonContainer>
-    <FormButton type="submit">Search</FormButton>
+    <FormButton type="submit" disabled={disabled}>{submitLabel}</FormButton>
   </ButtonContainer>
 </form>
 <div class="results">
-  {#if $noResultsError}
-    <p>Could not find currency or currency not supported.</p>
-  {:else if $searchError}
-    <p>Sorry, an error occurred. Please try again.</p>
+  {#if errorMessage}
+    <p>{errorMessage}</p>
   {/if}
 </div>
 
@@ -62,11 +31,13 @@
   form{
     padding: 1em;
     box-sizing: border-box;
+    margin: 0 auto;
+    max-width: 640px;
   }
 
 p{
   text-align: center;
-  margin: 1em;
+  margin: 0.5em 1em 1em;
 }
 div{
   margin: 0 1em;

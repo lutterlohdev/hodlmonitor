@@ -9,23 +9,43 @@
 	import Snackbar from "./components/Snackbar.svelte";
 	import Tabs from "./Tabs.svelte";
 	import {onMount} from "svelte";
+	import { fetchJson } from "./utils";
 	
 	onMount(async () => {
-		let interval = setInterval(()=> {
+		const refreshPrices = () => {
 			updatePortfolioPrices($portfolioSymbols);
 			updateWatchlistPrices($watchlistSymbols);
-		}, 60000);
-	  
-		fetch("https://api.coingecko.com/api/v3/coins/list?include_platform=false").then(result => {
-			return result.json();
-		})
-      .then(data => cryptoList.set(data))
-      .catch(error => {
-        snackbar.addMessage("Error fetching available cryptocurrencies.");
-        console.error("Error getting list of available cryptocurrencies", error);
-      });
+		};
 
-		return () => {clearInterval(interval)};
+		const interval = setInterval(refreshPrices, 60000);
+
+		const handleOnline = () => {
+			snackbar.addMessage("Back online. Prices can refresh again.", 2500);
+			refreshPrices();
+		};
+
+		const handleOffline = () => {
+			snackbar.addMessage("You are offline. Showing last known prices.", 3500);
+		};
+
+		window.addEventListener("online", handleOnline);
+		window.addEventListener("offline", handleOffline);
+
+		try {
+			const data = await fetchJson("https://api.coingecko.com/api/v3/coins/list?include_platform=false", {
+				timeout: 15000,
+			});
+			cryptoList.set(data);
+		} catch (error) {
+			snackbar.addMessage("Error fetching available cryptocurrencies.");
+			console.error("Error getting list of available cryptocurrencies", error);
+		}
+
+		return () => {
+			clearInterval(interval);
+			window.removeEventListener("online", handleOnline);
+			window.removeEventListener("offline", handleOffline);
+		};
 	});
 </script>
 

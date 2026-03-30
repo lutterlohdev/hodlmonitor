@@ -18,11 +18,12 @@
     role="button"
     tabindex="0"
     aria-label="Dismiss messages"
+    aria-live="polite"
   >
     <h2 class="sr-only">Informational Messages (Click to dismiss):</h2>
     <ul>
-      {#each $snackbar as message}
-        <li>{message}</li>
+      {#each $snackbar as message (message.id)}
+        <li>{message.text}</li>
       {/each}
     </ul>
   </div>

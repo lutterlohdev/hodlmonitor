@@ -1,8 +1,7 @@
 /node_modules
+/dist
 /public/build
 /src/nomicsKey.json
-
-/.firebase
 
 # Service Worker
 **/workbox*

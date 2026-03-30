@@ -1,5 +1,10 @@
 import { derived, writable } from "svelte/store";
-import { getDollarDisplayValue, getPercentage} from "../utils";
+import {
+  fetchJson,
+  getDollarDisplayValue,
+  getPercentage,
+  safeJsonParse,
+} from "../utils";
 import { snackbar } from "../store";
 
 export const watchlist = createWatchlist();
@@ -9,7 +14,7 @@ export const selectedId = writable(null);
 const apiResponse = writable([]);
 
 function createWatchlist() {
-  const { subscribe, set, update } = writable(JSON.parse(localStorage.getItem("watchlist")) || []);
+  const { subscribe, set, update } = writable(safeJsonParse(localStorage.getItem("watchlist"), []));
 
   return {
     subscribe,
@@ -33,7 +38,11 @@ function createWatchlist() {
     updateData: (apiData) => {
       // Price needs to stay part of portfolio and not just displayData or we run into some weird loading issues
       update((watchlistArray) => {
-        const index = watchlistArray.findIndex((obj) => obj.id == apiData.id);
+        const index = watchlistArray.findIndex((obj) => obj.id === apiData.id);
+        if (index < 0) {
+          return watchlistArray;
+        }
+
         watchlistArray[index].price = apiData.current_price;
         watchlistArray[index].ath = apiData.ath;
         watchlistArray[index].priceChange24hPercentage = apiData.price_change_percentage_24h;
@@ -52,11 +61,13 @@ function createWatchlist() {
       if (isArray) {
         // This just checks if the property exists, not the type. Could go that far but probably not needed.
         fileData.forEach((item) => {
-          !(
-            item.hasOwnProperty("id") &&
-            item.hasOwnProperty("name") &&
-            item.hasOwnProperty("symbol")
-          ) ? (errorFlag = true) : null;
+          if (!(
+            Object.prototype.hasOwnProperty.call(item, "id") &&
+            Object.prototype.hasOwnProperty.call(item, "name") &&
+            Object.prototype.hasOwnProperty.call(item, "symbol")
+          )) {
+            errorFlag = true;
+          }
         });
       }
       if (!errorFlag) {
@@ -75,6 +86,7 @@ watchlist.subscribe((value) => {
 });
 
 export const displayData = derived([watchlist, apiResponse], ([$watchlist, $apiResponse]) => {
+  void $apiResponse;
   let returnData = [];
 
   $watchlist.forEach((item) => {
@@ -108,44 +120,42 @@ export const displayData = derived([watchlist, apiResponse], ([$watchlist, $apiR
     returnData.push(displayItem);
   });
 
-  returnData.sort(function(a, b) {
-    const textA = a.symbol.toUpperCase();
-    const textB = b.symbol.toUpperCase();
-    return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;
-  });
+  returnData.sort((a, b) => a.symbol.localeCompare(b.symbol));
 
   return returnData;
 });
 
-export const updateWatchlistPrices = (symbols) => {
+export const updateWatchlistPrices = async (symbols) => {
   if (symbols.length > 0) {
     snackbar.addMessage("Watchlist prices refreshing...", 2000);
-    fetch(
-        "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=" +
-        symbols +
-        "&order=market_cap_desc&per_page=250&page=1&sparkline=false&price_change_percentage=24h",
-    )
-        .then((result) => {
-          return result.json();
-        })
-        .then((json) => {
-          apiResponse.set(json);
-        })
-        .catch((error) => {
-          snackbar.addMessage("Error getting current prices.");
-          console.error("Error getting current prices.", error);
-          return [];
-        });
+
+    const searchParams = new URLSearchParams({
+      vs_currency: "usd",
+      ids: symbols,
+      order: "market_cap_desc",
+      per_page: "250",
+      page: "1",
+      sparkline: "false",
+      price_change_percentage: "24h",
+    });
+
+    try {
+      const json = await fetchJson(`https://api.coingecko.com/api/v3/coins/markets?${searchParams.toString()}`);
+      apiResponse.set(json);
+    } catch (error) {
+      snackbar.addMessage("Error getting current prices.");
+      console.error("Error getting current prices.", error);
+    }
   }
 };
 
 apiResponse.subscribe((value) => {
-  if (Object.keys(value).length > 0) {
+  if (Array.isArray(value) && value.length > 0) {
     const timestamp = new Date();
     lastUpdated.set(timestamp.toLocaleDateString() + " " + timestamp.toLocaleTimeString());
   }
-  Object.keys(value).forEach(key => {
-    watchlist.updateData(value[key]);
+  value.forEach((item) => {
+    watchlist.updateData(item);
   });
 });
 

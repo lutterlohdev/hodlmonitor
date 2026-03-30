@@ -1,13 +1,14 @@
 <script>
-  export let results;
-  export let itemToAdd;
+  export let title = "Select a cryptocurrency";
+  export let results = [];
+  export let onSelect = () => {};
 </script>
 <div class="results">
-  <p>Select Crypto</p>
+  <p>{title}</p>
   <ul>
-  {#each $results as result}
+  {#each results as result}
     <li>
-      <button type="button" class="result-button" on:click={() => itemToAdd.set(result)}>
+      <button type="button" class="result-button" on:click={() => onSelect(result)}>
         {result.name} ({result.symbol.toUpperCase()})
         <span class="material-icons">add</span>
       </button>
@@ -26,9 +27,9 @@
   
 ul{
   list-style: none;
-    padding: 0;
-    margin: 0 auto;
-    max-width: 600px;
+  padding: 0;
+  margin: 0 auto;
+  max-width: 640px;
 }
 li {
   margin-bottom: .4em;
@@ -37,17 +38,18 @@ li {
   cursor: pointer;
   width: 100%;
   text-align: left;
-  background: transparent;
+  background: color-mix(in srgb, var(--secondary-body-color) 92%, transparent);
   font: inherit;
-  padding: 1em;
-  border: 3px solid;
-  color: var(--alt-text-color);
-  transition: .5s all;
+  padding: 0.9em 1em;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  color: var(--text-color);
+  transition: 0.25s all;
 }
 .result-button:hover,
 .result-button:focus{
-  background: var(--alt-text-color);
-  color: var(--primary-color);
+  background: color-mix(in srgb, var(--primary-color) 12%, transparent);
+  border-color: color-mix(in srgb, var(--primary-color) 60%, var(--border-color));
 }
 .result-button:active{
   transform: scale(.95)
@@ -66,16 +68,14 @@ p{
 
 @media(prefers-color-scheme: dark){
   .result-button {
-    cursor: pointer;
-    padding: 1em;
-    border: 3px solid;
+    border: 1px solid var(--border-color);
     color: var(--primary-color);
-    background: var(--secondary-body-color);
-    transition: .5s all;
+    background: color-mix(in srgb, var(--secondary-body-color) 98%, black);
+    transition: 0.25s all;
   }
   .result-button:hover,
   .result-button:focus{
-    background: var(--alt-text-color);
+    background: color-mix(in srgb, var(--primary-color) 14%, transparent);
     color: var(--primary-color);
   }
 }
